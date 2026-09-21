@@ -49,7 +49,7 @@ function loadEpisode(index, autoplay = false) {
         episodes[nextIndex];
 
 
-    // NOW PLAYING
+    /* NOW PLAYING */
 
     document.getElementById("showTitle").textContent =
         "Seinfeld";
@@ -58,7 +58,7 @@ function loadEpisode(index, autoplay = false) {
         episodeLabel(episode);
 
 
-    // UP NEXT
+    /* UP NEXT */
 
     document.getElementById("nextShow").textContent =
         "Seinfeld";
@@ -67,12 +67,12 @@ function loadEpisode(index, autoplay = false) {
         episodeLabel(nextEpisode);
 
 
-    // Hide loading/offline message
+    /* Hide loading message */
 
     placeholder.style.display = "none";
 
 
-    // Build URL from R2 object key
+    /* Build R2 video URL */
 
     const videoURL =
         R2_URL +
@@ -93,10 +93,38 @@ function loadEpisode(index, autoplay = false) {
     );
 
 
+    /*
+       Load episode.
+
+       Every newly loaded episode starts from
+       the beginning.
+    */
+
     videoPlayer.src = videoURL;
     videoPlayer.load();
 
 }
+
+
+/* ==========================================
+   EPISODE METADATA LOADED
+========================================== */
+
+videoPlayer.addEventListener("loadedmetadata", () => {
+
+    /*
+       Explicitly start every episode at 00:00.
+    */
+
+    videoPlayer.currentTime = 0;
+
+    console.log(
+        `Starting from 00:00: ${episodeLabel(
+            episodes[currentEpisode]
+        )}`
+    );
+
+});
 
 
 /* ==========================================
@@ -106,8 +134,16 @@ function loadEpisode(index, autoplay = false) {
 videoPlayer.addEventListener("canplay", () => {
 
     console.log(
-        `Ready: ${episodeLabel(episodes[currentEpisode])}`
+        `Ready: ${episodeLabel(
+            episodes[currentEpisode]
+        )}`
     );
+
+
+    /*
+       When an episode has automatically followed
+       another episode, start playing it.
+    */
 
     if (shouldAutoplay) {
 
@@ -150,8 +186,26 @@ videoPlayer.addEventListener("ended", () => {
     );
 
 
-    // Move to next episode.
-    // % makes final episode loop back to episode 0.
+    /*
+       Move to the next episode.
+
+       The modulo (%) causes the final episode
+       to return to episode 1.
+
+       Example:
+
+       S01E01
+          ↓
+       S01E02
+          ↓
+       S01E03
+          ↓
+         ...
+          ↓
+       Final Episode
+          ↓
+       S01E01
+    */
 
     const nextIndex =
         (currentEpisode + 1) % episodes.length;
@@ -164,6 +218,10 @@ videoPlayer.addEventListener("ended", () => {
     );
 
 
+    /*
+       true = automatically play the next episode.
+    */
+
     loadEpisode(nextIndex, true);
 
 });
@@ -175,11 +233,16 @@ videoPlayer.addEventListener("ended", () => {
 
 videoPlayer.addEventListener("error", () => {
 
+    if (episodes.length === 0) {
+        return;
+    }
+
     console.error(
         `Video error: ${episodeLabel(
             episodes[currentEpisode]
         )}`
     );
+
 
     if (videoPlayer.error) {
 
@@ -199,7 +262,7 @@ videoPlayer.addEventListener("error", () => {
 
 
 /* ==========================================
-   LOAD LIBRARY FROM CLOUDFLARE
+   LOAD EPISODE LIBRARY
 ========================================== */
 
 async function loadLibrary() {
@@ -209,7 +272,9 @@ async function loadLibrary() {
         placeholder.style.display = "flex";
 
         const response =
-            await fetch(API_URL);
+            await fetch(API_URL, {
+                cache: "no-store"
+            });
 
 
         if (!response.ok) {
@@ -245,7 +310,13 @@ async function loadLibrary() {
         console.table(episodes);
 
 
-        // Start from first available episode
+        /*
+           Always start with the first episode
+           when the website is opened/refreshed.
+
+           false = don't force autoplay.
+           The viewer presses Play initially.
+        */
 
         loadEpisode(0, false);
 
