@@ -4,36 +4,37 @@ const placeholder = document.getElementById("playerPlaceholder");
 const VIDEO_URL =
     "https://pub-0c54462e81d94754bbee0244e9ff69d7.r2.dev/Seinfeld.S01E01.The.Seinfeld.Chronicles.720p.WEBrip.AAC.EN-SUB.x264-%5BMULVAcoded%5D.mkv";
 
-// Update page text
+// Update programme information
 document.getElementById("showTitle").textContent = "Seinfeld";
 
 document.getElementById("episodeTitle").textContent =
     "S01 E01 · The Seinfeld Chronicles";
 
-// Remove offline overlay immediately
+// Hide our overlay so we can see the real HTML5 player
 placeholder.style.display = "none";
 
-// Load video
+// Attach video
 videoPlayer.src = VIDEO_URL;
 videoPlayer.load();
 
 
-// Diagnostics
+// DEBUGGING
+
 videoPlayer.addEventListener("loadstart", () => {
-    console.log("Video loading started");
+    console.log("VIDEO: load started");
 });
 
 videoPlayer.addEventListener("loadedmetadata", () => {
-    console.log("Metadata loaded");
+    console.log("VIDEO: metadata loaded");
     console.log("Duration:", videoPlayer.duration);
 });
 
 videoPlayer.addEventListener("canplay", () => {
-    console.log("Video can play");
+    console.log("VIDEO: ready to play");
 });
 
 videoPlayer.addEventListener("playing", () => {
-    console.log("Video is playing");
+    console.log("VIDEO: playing");
 });
 
 videoPlayer.addEventListener("error", () => {
@@ -41,7 +42,7 @@ videoPlayer.addEventListener("error", () => {
     console.error("VIDEO ERROR");
 
     if (videoPlayer.error) {
-        console.error("Error code:", videoPlayer.error.code);
+        console.error("Code:", videoPlayer.error.code);
         console.error("Message:", videoPlayer.error.message);
     }
 
