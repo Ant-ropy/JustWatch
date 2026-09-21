@@ -1,1 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
 
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta name="theme-color" content="#080a0d">
+
+    <title>JustWatch</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <!-- HEADER -->
+    <header class="header">
+
+        <a href="./" class="logo">
+            JUST<span>WATCH</span>
+        </a>
+
+        <nav class="nav">
+            <a href="#watch" class="active">Watch</a>
+            <a href="#channels">Channels</a>
+            <a href="#schedule">Schedule</a>
+        </nav>
+
+    </header>
+
+
+    <!-- MAIN -->
+    <main>
+
+        <!-- PLAYER -->
+        <section class="watch-section" id="watch">
+
+            <div class="player-container">
+
+                <video
+                    id="videoPlayer"
+                    controls
+                    playsinline
+                    preload="metadata">
+                </video>
+
+                <div class="player-placeholder" id="playerPlaceholder">
+
+                    <div class="play-icon">
+                        ▶
+                    </div>
+
+                    <p>Channel offline</p>
+
+                </div>
+
+            </div>
+
+
+            <!-- PROGRAMME INFO -->
+            <div class="programme-area">
+
+                <div class="programme-info">
+
+                    <div class="live-label">
+                        <span class="live-dot"></span>
+                        LIVE
+                    </div>
+
+                    <h1 id="showTitle">
+                        Seinfeld
+                    </h1>
+
+                    <p class="episode" id="episodeTitle">
+                        S01 E01 · Good News, Bad News
+                    </p>
+
+                    <p class="description">
+                        You're watching the live channel.
+                    </p>
+
+                </div>
+
+
+                <!-- UP NEXT -->
+                <div class="up-next">
+
+                    <span class="small-heading">
+                        UP NEXT
+                    </span>
+
+                    <h2 id="nextShow">
+                        Seinfeld
+                    </h2>
+
+                    <p id="nextEpisode">
+                        S01 E02 · The Stake Out
+                    </p>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- CHANNELS -->
+        <section class="channels-section" id="channels">
+
+            <div class="section-heading">
+
+                <div>
+                    <span class="small-heading">
+                        WATCH
+                    </span>
+
+                    <h2>Channels</h2>
+                </div>
+
+            </div>
+
+
+            <div class="channel-grid">
+
+                <!-- SEINFELD CHANNEL -->
+                <button
+                    class="channel-card active-channel"
+                    data-channel="seinfeld">
+
+                    <div class="channel-image">
+
+                        <div class="channel-name">
+                            SEINFELD
+                        </div>
+
+                        <div class="channel-live">
+                            <span></span>
+                            LIVE
+                        </div>
+
+                    </div>
+
+                    <div class="channel-details">
+
+                        <strong>Seinfeld</strong>
+
+                        <span>
+                            24/7 Episodes
+                        </span>
+
+                    </div>
+
+                </button>
+
+
+                <!-- FUTURE CHANNEL -->
+                <button
+                    class="channel-card coming-soon"
+                    disabled>
+
+                    <div class="channel-image">
+
+                        <div class="channel-name">
+                            +
+                        </div>
+
+                    </div>
+
+                    <div class="channel-details">
+
+                        <strong>Coming Soon</strong>
+
+                        <span>
+                            New channel
+                        </span>
+
+                    </div>
+
+                </button>
+
+
+                <!-- FUTURE CHANNEL -->
+                <button
+                    class="channel-card coming-soon"
+                    disabled>
+
+                    <div class="channel-image">
+
+                        <div class="channel-name">
+                            +
+                        </div>
+
+                    </div>
+
+                    <div class="channel-details">
+
+                        <strong>Coming Soon</strong>
+
+                        <span>
+                            New channel
+                        </span>
+
+                    </div>
+
+                </button>
+
+            </div>
+
+        </section>
+
+
+        <!-- SCHEDULE -->
+        <section class="schedule-section" id="schedule">
+
+            <span class="small-heading">
+                LIVE CHANNEL
+            </span>
+
+            <h2>Schedule</h2>
+
+
+            <div class="schedule">
+
+                <div class="schedule-item current">
+
+                    <div class="schedule-time">
+                        NOW
+                    </div>
+
+                    <div>
+                        <strong>Seinfeld</strong>
+
+                        <p>
+                            S01 E01 · Good News, Bad News
+                        </p>
+                    </div>
+
+                </div>
+
+
+                <div class="schedule-item">
+
+                    <div class="schedule-time">
+                        NEXT
+                    </div>
+
+                    <div>
+                        <strong>Seinfeld</strong>
+
+                        <p>
+                            S01 E02 · The Stake Out
+                        </p>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <!-- FOOTER -->
+    <footer>
+
+        <div class="logo footer-logo">
+            JUST<span>WATCH</span>
+        </div>
+
+        <p>
+            Continuous television.
+        </p>
+
+    </footer>
+
+
+    <script src="app.js"></script>
+
+</body>
+
+</html>
