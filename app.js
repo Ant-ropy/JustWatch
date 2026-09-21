@@ -334,7 +334,7 @@ async function loadLibrary() {
             "flex";
 
         placeholder.textContent =
-            "Tuning into Vandelay TV...";
+            "Tuning into Del Boca Vista...";
 
 
         const response =
@@ -407,7 +407,7 @@ async function loadLibrary() {
             "flex";
 
         placeholder.textContent =
-            "Unable to tune into Vandelay TV.";
+            "Unable to tune into Del Boca Vista.";
 
     }
 
