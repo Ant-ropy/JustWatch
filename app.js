@@ -7,9 +7,23 @@ const API_URL =
 const R2_URL =
     "https://pub-0c54462e81d94754bbee0244e9ff69d7.r2.dev/";
 
+/*
+    VANDELAY TV BROADCAST START
+
+    This is the point in time at which we pretend
+    S01E01 began broadcasting.
+
+    IMPORTANT:
+    Keep this value permanently once you're happy
+    with the schedule.
+*/
+
+const CHANNEL_START =
+    new Date("2026-09-21T20:00:00+01:00").getTime();
+
+
 let episodes = [];
 let currentEpisode = 0;
-let shouldAutoplay = false;
 
 
 /* ==========================================
@@ -28,19 +42,173 @@ function episodeLabel(episode) {
 
 
 /* ==========================================
-   LOAD EPISODE
+   VIDEO URL
 ========================================== */
 
-function loadEpisode(index, autoplay = false) {
+function getVideoURL(episode) {
 
-    if (episodes.length === 0) {
-        return;
+    return (
+        R2_URL +
+        episode.key
+            .split("/")
+            .map(part => encodeURIComponent(part))
+            .join("/")
+    );
+
+}
+
+
+/* ==========================================
+   READ VIDEO DURATION
+========================================== */
+
+function getDuration(episode) {
+
+    return new Promise((resolve, reject) => {
+
+        const video = document.createElement("video");
+
+        video.preload = "metadata";
+
+        video.src = getVideoURL(episode);
+
+
+        video.addEventListener(
+            "loadedmetadata",
+            () => {
+
+                const duration = video.duration;
+
+                video.removeAttribute("src");
+                video.load();
+
+                resolve(duration);
+
+            },
+            { once: true }
+        );
+
+
+        video.addEventListener(
+            "error",
+            () => {
+
+                reject(
+                    new Error(
+                        `Could not read duration for ${episodeLabel(episode)}`
+                    )
+                );
+
+            },
+            { once: true }
+        );
+
+    });
+
+}
+
+
+/* ==========================================
+   BUILD BROADCAST SCHEDULE
+========================================== */
+
+async function buildSchedule() {
+
+    console.log("Reading episode durations...");
+
+    for (let i = 0; i < episodes.length; i++) {
+
+        episodes[i].duration =
+            await getDuration(episodes[i]);
+
+        console.log(
+            episodeLabel(episodes[i]),
+            Math.round(episodes[i].duration),
+            "seconds"
+        );
+
     }
 
-    currentEpisode = index;
-    shouldAutoplay = autoplay;
+}
 
-    const episode = episodes[currentEpisode];
+
+/* ==========================================
+   FIND WHAT SHOULD BE ON NOW
+========================================== */
+
+function getBroadcastPosition() {
+
+    const totalRuntime =
+        episodes.reduce(
+            (total, episode) =>
+                total + episode.duration,
+            0
+        );
+
+
+    /*
+        How many seconds have passed since
+        Vandelay TV started broadcasting?
+    */
+
+    const elapsed =
+        Math.max(
+            0,
+            (Date.now() - CHANNEL_START) / 1000
+        );
+
+
+    /*
+        Loop the entire series forever.
+    */
+
+    let position =
+        elapsed % totalRuntime;
+
+
+    /*
+        Work through the episodes until we find
+        which one contains the current position.
+    */
+
+    for (let i = 0; i < episodes.length; i++) {
+
+        if (position < episodes[i].duration) {
+
+            return {
+                index: i,
+                time: position
+            };
+
+        }
+
+        position -= episodes[i].duration;
+
+    }
+
+
+    return {
+        index: 0,
+        time: 0
+    };
+
+}
+
+
+/* ==========================================
+   LOAD CURRENT BROADCAST
+========================================== */
+
+function loadBroadcast() {
+
+    const broadcast =
+        getBroadcastPosition();
+
+    currentEpisode =
+        broadcast.index;
+
+    const episode =
+        episodes[currentEpisode];
 
     const nextIndex =
         (currentEpisode + 1) % episodes.length;
@@ -67,214 +235,115 @@ function loadEpisode(index, autoplay = false) {
         episodeLabel(nextEpisode);
 
 
-    /* Hide loading message */
-
-    placeholder.style.display = "none";
-
-
-    /* Build R2 video URL */
-
-    const videoURL =
-        R2_URL +
-        episode.key
-            .split("/")
-            .map(part => encodeURIComponent(part))
-            .join("/");
+    placeholder.style.display =
+        "none";
 
 
     console.log(
-        `Loading episode ${currentEpisode + 1}/${episodes.length}:`,
+        "Currently broadcasting:",
         episodeLabel(episode)
     );
 
     console.log(
-        "Video URL:",
-        videoURL
+        "Broadcast position:",
+        Math.floor(broadcast.time),
+        "seconds"
     );
 
 
-    /*
-       Load episode.
+    videoPlayer.src =
+        getVideoURL(episode);
 
-       Every newly loaded episode starts from
-       the beginning.
-    */
-
-    videoPlayer.src = videoURL;
     videoPlayer.load();
 
+
+    /*
+        Once we know the video's metadata,
+        jump to the LIVE broadcast position.
+    */
+
+    videoPlayer.addEventListener(
+        "loadedmetadata",
+        () => {
+
+            videoPlayer.currentTime =
+                broadcast.time;
+
+            console.log(
+                "Synced to:",
+                Math.floor(broadcast.time),
+                "seconds"
+            );
+
+        },
+        { once: true }
+    );
+
 }
-
-
-/* ==========================================
-   EPISODE METADATA LOADED
-========================================== */
-
-videoPlayer.addEventListener("loadedmetadata", () => {
-
-    /*
-       Explicitly start every episode at 00:00.
-    */
-
-    videoPlayer.currentTime = 0;
-
-    console.log(
-        `Starting from 00:00: ${episodeLabel(
-            episodes[currentEpisode]
-        )}`
-    );
-
-});
-
-
-/* ==========================================
-   VIDEO READY
-========================================== */
-
-videoPlayer.addEventListener("canplay", () => {
-
-    console.log(
-        `Ready: ${episodeLabel(
-            episodes[currentEpisode]
-        )}`
-    );
-
-
-    /*
-       When an episode has automatically followed
-       another episode, start playing it.
-    */
-
-    if (shouldAutoplay) {
-
-        shouldAutoplay = false;
-
-        videoPlayer.play()
-            .then(() => {
-
-                console.log(
-                    `Playing: ${episodeLabel(
-                        episodes[currentEpisode]
-                    )}`
-                );
-
-            })
-            .catch(error => {
-
-                console.error(
-                    "Automatic playback prevented:",
-                    error
-                );
-
-            });
-
-    }
-
-});
 
 
 /* ==========================================
    EPISODE FINISHED
 ========================================== */
 
-videoPlayer.addEventListener("ended", () => {
+videoPlayer.addEventListener(
+    "ended",
+    () => {
 
-    console.log(
-        `Finished: ${episodeLabel(
-            episodes[currentEpisode]
-        )}`
-    );
+        /*
+            Don't simply assume the next episode.
 
+            Ask the clock what Vandelay TV should
+            currently be broadcasting.
+        */
 
-    /*
-       Move to the next episode.
-
-       The modulo (%) causes the final episode
-       to return to episode 1.
-
-       Example:
-
-       S01E01
-          ↓
-       S01E02
-          ↓
-       S01E03
-          ↓
-         ...
-          ↓
-       Final Episode
-          ↓
-       S01E01
-    */
-
-    const nextIndex =
-        (currentEpisode + 1) % episodes.length;
+        loadBroadcast();
 
 
-    console.log(
-        `Moving to: ${episodeLabel(
-            episodes[nextIndex]
-        )}`
-    );
+        videoPlayer.addEventListener(
+            "canplay",
+            () => {
 
+                videoPlayer.play()
+                    .catch(error => {
 
-    /*
-       true = automatically play the next episode.
-    */
+                        console.error(
+                            "Autoplay prevented:",
+                            error
+                        );
 
-    loadEpisode(nextIndex, true);
+                    });
 
-});
-
-
-/* ==========================================
-   VIDEO ERROR
-========================================== */
-
-videoPlayer.addEventListener("error", () => {
-
-    if (episodes.length === 0) {
-        return;
-    }
-
-    console.error(
-        `Video error: ${episodeLabel(
-            episodes[currentEpisode]
-        )}`
-    );
-
-
-    if (videoPlayer.error) {
-
-        console.error(
-            "Error code:",
-            videoPlayer.error.code
-        );
-
-        console.error(
-            "Error message:",
-            videoPlayer.error.message
+            },
+            { once: true }
         );
 
     }
-
-});
+);
 
 
 /* ==========================================
-   LOAD EPISODE LIBRARY
+   LOAD LIBRARY
 ========================================== */
 
 async function loadLibrary() {
 
     try {
 
-        placeholder.style.display = "flex";
+        placeholder.style.display =
+            "flex";
+
+        placeholder.textContent =
+            "Tuning into Vandelay TV...";
+
 
         const response =
-            await fetch(API_URL, {
-                cache: "no-store"
-            });
+            await fetch(
+                API_URL,
+                {
+                    cache: "no-store"
+                }
+            );
 
 
         if (!response.ok) {
@@ -294,10 +363,13 @@ async function loadLibrary() {
             data.episodes;
 
 
-        if (!episodes || episodes.length === 0) {
+        if (
+            !episodes ||
+            episodes.length === 0
+        ) {
 
             throw new Error(
-                "No episodes were found."
+                "No episodes found."
             );
 
         }
@@ -307,32 +379,35 @@ async function loadLibrary() {
             `${episodes.length} episodes discovered`
         );
 
-        console.table(episodes);
+
+        /*
+            Temporarily read the duration
+            of each MP4.
+        */
+
+        await buildSchedule();
 
 
         /*
-           Always start with the first episode
-           when the website is opened/refreshed.
-
-           false = don't force autoplay.
-           The viewer presses Play initially.
+            Work out what's broadcasting NOW.
         */
 
-        loadEpisode(0, false);
+        loadBroadcast();
 
     }
 
     catch (error) {
 
         console.error(
-            "Unable to load library:",
+            "Unable to start channel:",
             error
         );
 
-        placeholder.style.display = "flex";
+        placeholder.style.display =
+            "flex";
 
         placeholder.textContent =
-            "Unable to load channel.";
+            "Unable to tune into Vandelay TV.";
 
     }
 
@@ -340,7 +415,7 @@ async function loadLibrary() {
 
 
 /* ==========================================
-   START
+   START VANDELAY TV
 ========================================== */
 
 loadLibrary();
