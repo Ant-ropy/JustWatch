@@ -1,109 +1,58 @@
-/*
-    JustWatch
-    Live Channel Player
-
-    We'll add the actual channel scheduling
-    and Cloudflare R2 videos here later.
-*/
-
-
-const videoPlayer =
-    document.getElementById("videoPlayer");
-
-
-const placeholder =
-    document.getElementById("playerPlaceholder");
-
-
-/*
-    Example channel structure.
-
-    Later we'll put all episode information
-    into this structure.
-*/
+const videoPlayer = document.getElementById("videoPlayer");
+const placeholder = document.getElementById("playerPlaceholder");
 
 const channels = {
-
     seinfeld: {
-
         name: "Seinfeld",
 
         episodes: [
-
             {
                 season: 1,
                 episode: 1,
-                title: "Good News, Bad News",
-                duration: 0,
-                video: ""
-            },
-
-            {
-                season: 1,
-                episode: 2,
-                title: "The Stake Out",
-                duration: 0,
-                video: ""
+                title: "The Seinfeld Chronicles",
+                file: "https://pub-0c54462e81d94754bbee0244e9ff69d7.r2.dev/Seinfeld.S01E01.The.Seinfeld.Chronicles.720p.WEBrip.AAC.EN-SUB.x264-%5BMULVAcoded%5D.mkv"
             }
-
         ]
-
     }
-
 };
 
 
-/*
-    Eventually this function will determine:
+function loadEpisode(channelName, episodeIndex) {
 
-    1. How long the channel has been running
-    2. Which episode should currently be playing
-    3. The correct timestamp in that episode
-    4. Which episode comes next
+    const channel = channels[channelName];
+    const episode = channel.episodes[episodeIndex];
 
-    This means everybody sees the same broadcast.
-*/
+    // Update player
+    videoPlayer.src = episode.file;
 
-function startChannel(channelName) {
+    // Update page information
+    document.getElementById("showTitle").textContent =
+        channel.name;
 
-    const channel =
-        channels[channelName];
+    document.getElementById("episodeTitle").textContent =
+        `S${episode.season} E${episode.episode} · ${episode.title}`;
 
-
-    if (!channel) {
-
-        console.error(
-            "Channel does not exist."
-        );
-
-        return;
-    }
-
-
-    console.log(
-        "Starting channel:",
-        channel.name
-    );
-
+    // Load video
+    videoPlayer.load();
 }
 
 
-/*
-    Hide placeholder once an actual video loads.
-*/
+videoPlayer.addEventListener("loadeddata", () => {
 
-videoPlayer.addEventListener(
-    "loadeddata",
-    () => {
+    // Remove "Channel Offline" overlay
+    placeholder.style.display = "none";
 
-        placeholder.style.display = "none";
-
-    }
-);
+});
 
 
-/*
-    Start default channel
-*/
+videoPlayer.addEventListener("error", () => {
 
-startChannel("seinfeld");
+    console.error(
+        "Video failed to load:",
+        videoPlayer.error
+    );
+
+});
+
+
+loadEpisode("seinfeld", 0);
