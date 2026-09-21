@@ -5,36 +5,23 @@ const BASE_URL =
     "https://pub-0c54462e81d94754bbee0244e9ff69d7.r2.dev/";
 
 const episodes = [
-    {
-        season: 1,
-        episode: 1,
-        title: "The Seinfeld Chronicles",
-        file: "Seinfeld.S01E01.The.Seinfeld.Chronicles.720p.WEBrip.AAC.EN-SUB.x264-[MULVAcoded].mkv"
-    },
-    {
-        season: 1,
-        episode: 2,
-        title: "The Stake Out",
-        file: "Seinfeld.S01E02.The.Stake.Out.720p.WEBrip.AAC.EN-SUB.x264-[MULVAcoded].mkv"
-    },
-    {
-        season: 1,
-        episode: 3,
-        title: "The Robbery",
-        file: "Seinfeld.S01E03.The.Robbery.720p.WEBrip.AAC.EN-SUB.x264-[MULVAcoded].mkv"
-    },
-    {
-        season: 1,
-        episode: 4,
-        title: "Male-Unbonding",
-        file: "Seinfeld.S01E04.Male-Unbonding.720p.WEBrip.AAC.EN-SUB.x264-[MULVAcoded].mkv"
-    },
-    {
-        season: 1,
-        episode: 5,
-        title: "The Stock Tip",
-        file: "Seinfeld.S01E05.The.Stock.Tip.720p.WEBrip.AAC.EN-SUB.x264-[MULVAcoded].mkv"
-    }
+    { season: 1, episode: 1, title: "The Seinfeld Chronicles", file: "Seinfeld.S01E01.The.Seinfeld.Chronicles.720p.WEBrip.AAC.EN-SUB.x264-[MULVAcoded].mkv" },
+    { season: 1, episode: 2, title: "The Stake Out", file: "Seinfeld.S01E02.The.Stake.Out.720p.WEBrip.AAC.EN-SUB.x264-[MULVAcoded].mkv" },
+    { season: 1, episode: 3, title: "The Robbery", file: "Seinfeld.S01E03.The.Robbery.720p.WEBrip.AAC.EN-SUB.x264-[MULVAcoded].mkv" },
+    { season: 1, episode: 4, title: "Male-Unbonding", file: "Seinfeld.S01E04.Male-Unbonding.720p.WEBrip.AAC.EN-SUB.x264-[MULVAcoded].mkv" },
+    { season: 1, episode: 5, title: "The Stock Tip", file: "Seinfeld.S01E05.The.Stock.Tip.720p.WEBrip.AAC.EN-SUB.x264-[MULVAcoded].mkv" },
+    { season: 2, episode: 1, title: "The Ex-Girlfriend", file: "Seinfeld.S02E01.The.Ex-Girlfriend.720p.WEBrip.AAC.EN-SUB.x264-[MULVAcoded].mkv" },
+    { season: 2, episode: 2, title: "The Pony Remark", file: "Seinfeld.S02E02.The.Pony.Remark.720p.WEBrip.AAC.EN-SUB.x264-[MULVAcoded].mkv" },
+    { season: 2, episode: 3, title: "The Jacket", file: "Seinfeld.S02E03.The.Jacket.720p.WEBrip.AAC.EN-SUB.x264-[MULVAcoded].mkv" },
+    { season: 2, episode: 4, title: "The Phone Message", file: "Seinfeld.S02E04.The.Phone.Message.720p.WEBrip.AAC.EN-SUB.x264-[MULVAcoded].mkv" },
+    { season: 2, episode: 5, title: "The Apartment", file: "Seinfeld.S02E05.The.Apartment.720p.WEBrip.AAC.EN-SUB.x264-[MULVAcoded].mkv" },
+    { season: 2, episode: 6, title: "The Statue", file: "Seinfeld.S02E06.The.Statue.720p.WEBrip.AAC.EN-SUB.x264-[MULVAcoded].mkv" },
+    { season: 2, episode: 7, title: "The Revenge", file: "Seinfeld.S02E07.The.Revenge.720p.WEBrip.AAC.EN-SUB.x264-[MULVAcoded].mkv" },
+    { season: 2, episode: 8, title: "The Heart Attack", file: "Seinfeld.S02E08.The.Heart.Attack.720p.WEBrip.AAC.EN-SUB.x264-[MULVAcoded].mkv" },
+    { season: 2, episode: 9, title: "The Deal", file: "Seinfeld.S02E09.The.Deal.720p.WEBrip.AAC.EN-SUB.x264-[MULVAcoded].mkv" },
+    { season: 2, episode: 10, title: "The Baby Shower", file: "Seinfeld.S02E10.The.Baby.Shower.720p.WEBrip.AAC.EN-SUB.x264-[MULVAcoded].mkv" },
+    { season: 2, episode: 11, title: "The Chinese Restaurant", file: "Seinfeld.S02E11.The.Chinese.Restaurant.720p.WEBrip.AAC.EN-SUB.x264-[MULVAcoded].mkv" },
+    { season: 2, episode: 12, title: "The Busboy", file: "Seinfeld.S02E12.The.Busboy.720p.WEBrip.AAC.EN-SUB.x264-[MULVAcoded].mkv" }
 ];
 
 let currentEpisode = 0;
