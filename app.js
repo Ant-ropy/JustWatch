@@ -38,149 +38,135 @@ const episodes = [
 ];
 
 let currentEpisode = 0;
+let shouldAutoplay = false;
 
 
-/* ------------------------------
-   LOAD EPISODE
---------------------------------*/
+function episodeLabel(episode) {
+    return (
+        `S${String(episode.season).padStart(2, "0")} ` +
+        `E${String(episode.episode).padStart(2, "0")} · ` +
+        episode.title
+    );
+}
+
 
 function loadEpisode(index, autoplay = false) {
 
     currentEpisode = index;
+    shouldAutoplay = autoplay;
 
     const episode = episodes[currentEpisode];
 
     const nextIndex =
         (currentEpisode + 1) % episodes.length;
 
-    const nextEpisode =
-        episodes[nextIndex];
+    const nextEpisode = episodes[nextIndex];
 
-
-    // Current programme information
+    // Update programme information
     document.getElementById("showTitle").textContent =
         "Seinfeld";
 
     document.getElementById("episodeTitle").textContent =
-        `S${String(episode.season).padStart(2, "0")} ` +
-        `E${String(episode.episode).padStart(2, "0")} · ` +
-        episode.title;
+        episodeLabel(episode);
 
-
-    // Up next
     document.getElementById("nextShow").textContent =
         "Seinfeld";
 
     document.getElementById("nextEpisode").textContent =
-        `S${String(nextEpisode.season).padStart(2, "0")} ` +
-        `E${String(nextEpisode.episode).padStart(2, "0")} · ` +
-        nextEpisode.title;
+        episodeLabel(nextEpisode);
 
-
-    // Hide offline placeholder
     placeholder.style.display = "none";
 
-
-    // Build safe R2 URL
+    // Encode filename safely for R2
     const videoURL =
-        BASE_URL +
-        encodeURIComponent(episode.file);
-
+        BASE_URL + encodeURIComponent(episode.file);
 
     console.log(
-        `Loading S${episode.season}E${episode.episode}:`,
-        episode.title
+        `Loading episode ${currentEpisode + 1}:`,
+        videoURL
     );
 
-
-    // Load video
     videoPlayer.src = videoURL;
     videoPlayer.load();
-
-
-    /*
-       Browsers normally allow autoplay when we're
-       continuing playback after the user already
-       started watching.
-    */
-
-    if (autoplay) {
-
-        videoPlayer.play().catch(error => {
-
-            console.log(
-                "Autoplay prevented:",
-                error
-            );
-
-        });
-
-    }
-
 }
 
 
-/* ------------------------------
-   EPISODE FINISHED
---------------------------------*/
-
-videoPlayer.addEventListener("ended", () => {
-
-    const nextEpisode =
-        (currentEpisode + 1) % episodes.length;
+// Wait until the NEW episode can actually play
+videoPlayer.addEventListener("canplay", () => {
 
     console.log(
-        "Episode finished. Loading next episode."
+        `Episode ${currentEpisode + 1} ready`
     );
 
-    loadEpisode(nextEpisode, true);
+    if (shouldAutoplay) {
 
+        shouldAutoplay = false;
+
+        videoPlayer.play()
+            .then(() => {
+                console.log(
+                    `Episode ${currentEpisode + 1} playing`
+                );
+            })
+            .catch(error => {
+                console.error(
+                    "Automatic playback failed:",
+                    error
+                );
+            });
+    }
 });
 
 
-/* ------------------------------
-   ERROR HANDLING
---------------------------------*/
+// Current episode finished
+videoPlayer.addEventListener("ended", () => {
+
+    console.log(
+        `Episode ${currentEpisode + 1} finished`
+    );
+
+    const nextIndex =
+        (currentEpisode + 1) % episodes.length;
+
+    console.log(
+        `Moving to episode ${nextIndex + 1}`
+    );
+
+    loadEpisode(nextIndex, true);
+});
+
+
+// Useful debugging
+videoPlayer.addEventListener("loadstart", () => {
+    console.log("Video load started");
+});
+
+videoPlayer.addEventListener("loadedmetadata", () => {
+    console.log(
+        "Metadata loaded. Duration:",
+        videoPlayer.duration
+    );
+});
 
 videoPlayer.addEventListener("error", () => {
 
-    console.error("VIDEO ERROR");
+    console.error(
+        `ERROR loading episode ${currentEpisode + 1}`
+    );
 
     if (videoPlayer.error) {
-
         console.error(
-            "Code:",
+            "Error code:",
             videoPlayer.error.code
         );
 
         console.error(
-            "Message:",
+            "Error message:",
             videoPlayer.error.message
         );
-
     }
-
 });
 
 
-/* ------------------------------
-   PLAYER STATUS
---------------------------------*/
-
-videoPlayer.addEventListener("playing", () => {
-
-    const episode =
-        episodes[currentEpisode];
-
-    console.log(
-        `Playing S${episode.season}E${episode.episode}`
-    );
-
-});
-
-
-/* ------------------------------
-   START CHANNEL
---------------------------------*/
-
-loadEpisode(0);
+// Start with E01
+loadEpisode(0, false);
