@@ -637,29 +637,13 @@ footer {
         font-size: 20px;
     }
 .channel-image {
-    position: relative;
-    overflow: hidden;
     aspect-ratio: 16 / 9;
 }
 
-.channel-image {
-    position: relative;
-    width: 100%;
-    height: auto !important;
-    aspect-ratio: 16 / 9 !important;
-    overflow: hidden;
-}
-
 .channel-image img {
-    position: absolute;
-    inset: 0;
-
     width: 100%;
     height: 100%;
-
     object-fit: cover;
-    object-position: center;
-    display: block;
 }
    
 
