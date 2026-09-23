@@ -7,15 +7,14 @@ const API_URL =
 const R2_URL =
     "https://pub-0c54462e81d94754bbee0244e9ff69d7.r2.dev/";
 
+
 /*
-    VANDELAY TV BROADCAST START
+    DEL BOCA VISTA BROADCAST START
 
-    This is the point in time at which we pretend
-    S01E01 began broadcasting.
+    This is the point at which S01E01
+    began broadcasting.
 
-    IMPORTANT:
-    Keep this value permanently once you're happy
-    with the schedule.
+    Keep this value fixed.
 */
 
 const CHANNEL_START =
@@ -59,80 +58,6 @@ function getVideoURL(episode) {
 
 
 /* ==========================================
-   READ VIDEO DURATION
-========================================== */
-
-function getDuration(episode) {
-
-    return new Promise((resolve, reject) => {
-
-        const video = document.createElement("video");
-
-        video.preload = "metadata";
-
-        video.src = getVideoURL(episode);
-
-
-        video.addEventListener(
-            "loadedmetadata",
-            () => {
-
-                const duration = video.duration;
-
-                video.removeAttribute("src");
-                video.load();
-
-                resolve(duration);
-
-            },
-            { once: true }
-        );
-
-
-        video.addEventListener(
-            "error",
-            () => {
-
-                reject(
-                    new Error(
-                        `Could not read duration for ${episodeLabel(episode)}`
-                    )
-                );
-
-            },
-            { once: true }
-        );
-
-    });
-
-}
-
-
-/* ==========================================
-   BUILD BROADCAST SCHEDULE
-========================================== */
-
-async function buildSchedule() {
-
-    console.log("Reading episode durations...");
-
-    for (let i = 0; i < episodes.length; i++) {
-
-        episodes[i].duration =
-            await getDuration(episodes[i]);
-
-        console.log(
-            episodeLabel(episodes[i]),
-            Math.round(episodes[i].duration),
-            "seconds"
-        );
-
-    }
-
-}
-
-
-/* ==========================================
    FIND WHAT SHOULD BE ON NOW
 ========================================== */
 
@@ -141,14 +66,23 @@ function getBroadcastPosition() {
     const totalRuntime =
         episodes.reduce(
             (total, episode) =>
-                total + episode.duration,
+                total + Number(episode.duration),
             0
         );
 
 
+    if (!totalRuntime) {
+
+        throw new Error(
+            "Episode durations are missing."
+        );
+
+    }
+
+
     /*
-        How many seconds have passed since
-        Vandelay TV started broadcasting?
+        Seconds elapsed since the channel
+        started broadcasting.
     */
 
     const elapsed =
@@ -159,7 +93,8 @@ function getBroadcastPosition() {
 
 
     /*
-        Loop the entire series forever.
+        Loop the complete Seinfeld library
+        forever.
     */
 
     let position =
@@ -167,13 +102,16 @@ function getBroadcastPosition() {
 
 
     /*
-        Work through the episodes until we find
-        which one contains the current position.
+        Find which episode contains the
+        current broadcast position.
     */
 
     for (let i = 0; i < episodes.length; i++) {
 
-        if (position < episodes[i].duration) {
+        const duration =
+            Number(episodes[i].duration);
+
+        if (position < duration) {
 
             return {
                 index: i,
@@ -182,7 +120,7 @@ function getBroadcastPosition() {
 
         }
 
-        position -= episodes[i].duration;
+        position -= duration;
 
     }
 
@@ -204,14 +142,18 @@ function loadBroadcast() {
     const broadcast =
         getBroadcastPosition();
 
+
     currentEpisode =
         broadcast.index;
+
 
     const episode =
         episodes[currentEpisode];
 
+
     const nextIndex =
         (currentEpisode + 1) % episodes.length;
+
 
     const nextEpisode =
         episodes[nextIndex];
@@ -244,12 +186,18 @@ function loadBroadcast() {
         episodeLabel(episode)
     );
 
+
     console.log(
         "Broadcast position:",
         Math.floor(broadcast.time),
         "seconds"
     );
 
+
+    /*
+        THIS IS NOW THE ONLY VIDEO FILE
+        THE BROWSER LOADS.
+    */
 
     videoPlayer.src =
         getVideoURL(episode);
@@ -258,8 +206,8 @@ function loadBroadcast() {
 
 
     /*
-        Once we know the video's metadata,
-        jump to the LIVE broadcast position.
+        Once the current video's metadata
+        loads, jump to the live position.
     */
 
     videoPlayer.addEventListener(
@@ -267,7 +215,11 @@ function loadBroadcast() {
         () => {
 
             videoPlayer.currentTime =
-                broadcast.time;
+                Math.min(
+                    broadcast.time,
+                    videoPlayer.duration
+                );
+
 
             console.log(
                 "Synced to:",
@@ -291,10 +243,9 @@ videoPlayer.addEventListener(
     () => {
 
         /*
-            Don't simply assume the next episode.
-
-            Ask the clock what Vandelay TV should
-            currently be broadcasting.
+            Re-check the real broadcast clock
+            rather than blindly loading the
+            next episode.
         */
 
         loadBroadcast();
@@ -304,7 +255,8 @@ videoPlayer.addEventListener(
             "canplay",
             () => {
 
-                videoPlayer.play()
+                videoPlayer
+                    .play()
                     .catch(error => {
 
                         console.error(
@@ -336,6 +288,11 @@ async function loadLibrary() {
         placeholder.textContent =
             "Tuning into Del Boca Vista...";
 
+
+        /*
+            Get the complete episode schedule
+            INCLUDING durations from Worker.
+        */
 
         const response =
             await fetch(
@@ -375,21 +332,47 @@ async function loadLibrary() {
         }
 
 
+        /*
+            Make sure every episode has a
+            valid duration.
+        */
+
+        const missingDuration =
+            episodes.find(
+                episode =>
+                    !Number.isFinite(
+                        Number(episode.duration)
+                    ) ||
+                    Number(episode.duration) <= 0
+            );
+
+
+        if (missingDuration) {
+
+            throw new Error(
+                `Missing duration for ${episodeLabel(missingDuration)}`
+            );
+
+        }
+
+
         console.log(
             `${episodes.length} episodes discovered`
         );
 
 
-        /*
-            Temporarily read the duration
-            of each MP4.
-        */
-
-        await buildSchedule();
+        console.log(
+            "Episode schedule loaded instantly."
+        );
 
 
         /*
-            Work out what's broadcasting NOW.
+            No buildSchedule().
+            No getDuration().
+            No loading every MP4.
+
+            Work out what should be broadcasting
+            and load ONLY that video.
         */
 
         loadBroadcast();
@@ -403,8 +386,10 @@ async function loadLibrary() {
             error
         );
 
+
         placeholder.style.display =
             "flex";
+
 
         placeholder.textContent =
             "Unable to tune into Del Boca Vista.";
@@ -415,7 +400,7 @@ async function loadLibrary() {
 
 
 /* ==========================================
-   START VANDELAY TV
+   START DEL BOCA VISTA
 ========================================== */
 
 loadLibrary();
