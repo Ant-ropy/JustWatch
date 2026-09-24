@@ -1,6 +1,24 @@
 const videoPlayer = document.getElementById("videoPlayer");
 const placeholder = document.getElementById("playerPlaceholder");
 
+const programmeType = document.getElementById("programmeType");
+const programmeTypeText = document.getElementById("programmeTypeText");
+
+const showTitle = document.getElementById("showTitle");
+const episodeTitle = document.getElementById("episodeTitle");
+const programmeDescription =
+    document.getElementById("programmeDescription");
+
+const upNext = document.getElementById("upNext");
+const nextShow = document.getElementById("nextShow");
+const nextEpisode = document.getElementById("nextEpisode");
+
+const backToLive = document.getElementById("backToLive");
+
+const scheduleNow = document.getElementById("scheduleNow");
+const scheduleNext = document.getElementById("scheduleNext");
+
+
 const API_URL =
     "https://justwatch-api.phil-roberts90.workers.dev/api/episodes";
 
@@ -10,19 +28,53 @@ const R2_URL =
 
 /*
     DEL BOCA VISTA BROADCAST START
-
-    This is the point at which S01E01
-    began broadcasting.
-
-    Keep this value fixed.
 */
 
 const CHANNEL_START =
     new Date("2026-09-21T20:00:00+01:00").getTime();
 
 
+/*
+    MOVIE LIBRARY
+
+    Adding future movies is easy:
+    add another object here and another
+    movie card in index.html.
+*/
+
+const movies = {
+
+    fellowship: {
+
+        title:
+            "The Lord of the Rings: The Fellowship of the Ring",
+
+        subtitle:
+            "Extended Edition · 2001",
+
+        description:
+            "The Fellowship of the Ring · Extended Edition",
+
+        key:
+            "Movies/LOTR/LOTR-Fellowship-Extended.mp4"
+
+    }
+
+};
+
+
 let episodes = [];
 let currentEpisode = 0;
+
+
+/*
+    playerMode can be:
+
+    "live"
+    "movie"
+*/
+
+let playerMode = "live";
 
 
 /* ==========================================
@@ -41,18 +93,25 @@ function episodeLabel(episode) {
 
 
 /* ==========================================
-   VIDEO URL
+   R2 URL
 ========================================== */
 
-function getVideoURL(episode) {
+function getR2URL(key) {
 
     return (
         R2_URL +
-        episode.key
+        key
             .split("/")
             .map(part => encodeURIComponent(part))
             .join("/")
     );
+
+}
+
+
+function getVideoURL(episode) {
+
+    return getR2URL(episode.key);
 
 }
 
@@ -80,11 +139,6 @@ function getBroadcastPosition() {
     }
 
 
-    /*
-        Seconds elapsed since the channel
-        started broadcasting.
-    */
-
     const elapsed =
         Math.max(
             0,
@@ -92,24 +146,15 @@ function getBroadcastPosition() {
         );
 
 
-    /*
-        Loop the complete Seinfeld library
-        forever.
-    */
-
     let position =
         elapsed % totalRuntime;
 
-
-    /*
-        Find which episode contains the
-        current broadcast position.
-    */
 
     for (let i = 0; i < episodes.length; i++) {
 
         const duration =
             Number(episodes[i].duration);
+
 
         if (position < duration) {
 
@@ -119,6 +164,7 @@ function getBroadcastPosition() {
             };
 
         }
+
 
         position -= duration;
 
@@ -134,10 +180,102 @@ function getBroadcastPosition() {
 
 
 /* ==========================================
-   LOAD CURRENT BROADCAST
+   UPDATE SCHEDULE
 ========================================== */
 
-function loadBroadcast() {
+function updateSchedule(
+    episode,
+    nextEpisodeObject
+) {
+
+    if (scheduleNow) {
+
+        scheduleNow.textContent =
+            episodeLabel(episode);
+
+    }
+
+
+    if (scheduleNext) {
+
+        scheduleNext.textContent =
+            episodeLabel(nextEpisodeObject);
+
+    }
+
+}
+
+
+/* ==========================================
+   LIVE UI
+========================================== */
+
+function showLiveUI(
+    episode,
+    nextEpisodeObject
+) {
+
+    programmeType.classList.remove(
+        "movie-mode"
+    );
+
+
+    programmeTypeText.textContent =
+        "LIVE";
+
+
+    showTitle.textContent =
+        "Seinfeld";
+
+
+    episodeTitle.textContent =
+        episodeLabel(episode);
+
+
+    programmeDescription.textContent =
+        "You're watching the live channel.";
+
+
+    nextShow.textContent =
+        "Seinfeld";
+
+
+    nextEpisode.textContent =
+        episodeLabel(nextEpisodeObject);
+
+
+    upNext.style.display =
+        "";
+
+
+    backToLive.hidden =
+        true;
+
+
+    updateSchedule(
+        episode,
+        nextEpisodeObject
+    );
+
+}
+
+
+/* ==========================================
+   LOAD CURRENT LIVE BROADCAST
+========================================== */
+
+function loadBroadcast(autoplay = false) {
+
+    if (!episodes.length) {
+
+        return;
+
+    }
+
+
+    playerMode =
+        "live";
+
 
     const broadcast =
         getBroadcastPosition();
@@ -152,29 +290,18 @@ function loadBroadcast() {
 
 
     const nextIndex =
-        (currentEpisode + 1) % episodes.length;
+        (currentEpisode + 1) %
+        episodes.length;
 
 
-    const nextEpisode =
+    const nextEpisodeObject =
         episodes[nextIndex];
 
 
-    /* NOW PLAYING */
-
-    document.getElementById("showTitle").textContent =
-        "Seinfeld";
-
-    document.getElementById("episodeTitle").textContent =
-        episodeLabel(episode);
-
-
-    /* UP NEXT */
-
-    document.getElementById("nextShow").textContent =
-        "Seinfeld";
-
-    document.getElementById("nextEpisode").textContent =
-        episodeLabel(nextEpisode);
+    showLiveUI(
+        episode,
+        nextEpisodeObject
+    );
 
 
     placeholder.style.display =
@@ -194,25 +321,29 @@ function loadBroadcast() {
     );
 
 
-    /*
-        THIS IS NOW THE ONLY VIDEO FILE
-        THE BROWSER LOADS.
-    */
-
     videoPlayer.src =
         getVideoURL(episode);
+
 
     videoPlayer.load();
 
 
-    /*
-        Once the current video's metadata
-        loads, jump to the live position.
-    */
-
     videoPlayer.addEventListener(
         "loadedmetadata",
         () => {
+
+            /*
+                Make sure the user hasn't
+                selected a movie while this
+                metadata was loading.
+            */
+
+            if (playerMode !== "live") {
+
+                return;
+
+            }
+
 
             videoPlayer.currentTime =
                 Math.min(
@@ -227,6 +358,22 @@ function loadBroadcast() {
                 "seconds"
             );
 
+
+            if (autoplay) {
+
+                videoPlayer
+                    .play()
+                    .catch(error => {
+
+                        console.log(
+                            "Autoplay prevented:",
+                            error
+                        );
+
+                    });
+
+            }
+
         },
         { once: true }
     );
@@ -235,7 +382,205 @@ function loadBroadcast() {
 
 
 /* ==========================================
-   EPISODE FINISHED
+   PLAY MOVIE
+========================================== */
+
+function playMovie(movieID) {
+
+    const movie =
+        movies[movieID];
+
+
+    if (!movie) {
+
+        console.error(
+            "Movie not found:",
+            movieID
+        );
+
+        return;
+
+    }
+
+
+    playerMode =
+        "movie";
+
+
+    /*
+        Change programme information.
+    */
+
+    programmeType.classList.add(
+        "movie-mode"
+    );
+
+
+    programmeTypeText.textContent =
+        "MOVIE";
+
+
+    showTitle.textContent =
+        movie.title;
+
+
+    episodeTitle.textContent =
+        movie.subtitle;
+
+
+    programmeDescription.textContent =
+        movie.description;
+
+
+    /*
+        Movies don't have an
+        "Up Next" live programme.
+    */
+
+    upNext.style.display =
+        "none";
+
+
+    /*
+        Give the viewer a way back
+        to the live channel.
+    */
+
+    backToLive.hidden =
+        false;
+
+
+    placeholder.style.display =
+        "none";
+
+
+    /*
+        Load movie from beginning.
+    */
+
+    videoPlayer.src =
+        getR2URL(movie.key);
+
+
+    videoPlayer.load();
+
+
+    videoPlayer.addEventListener(
+        "loadedmetadata",
+        () => {
+
+            if (playerMode !== "movie") {
+
+                return;
+
+            }
+
+
+            videoPlayer.currentTime =
+                0;
+
+
+            videoPlayer
+                .play()
+                .catch(error => {
+
+                    console.log(
+                        "Movie autoplay prevented:",
+                        error
+                    );
+
+                });
+
+        },
+        { once: true }
+    );
+
+
+    /*
+        Move the browser back to
+        the video player.
+    */
+
+    document
+        .getElementById("watch")
+        .scrollIntoView({
+            behavior: "smooth"
+        });
+
+}
+
+
+/* ==========================================
+   MOVIE BUTTONS
+========================================== */
+
+document
+    .querySelectorAll(
+        ".movie-card[data-movie]"
+    )
+    .forEach(button => {
+
+        button.addEventListener(
+            "click",
+            () => {
+
+                playMovie(
+                    button.dataset.movie
+                );
+
+            }
+        );
+
+    });
+
+
+/* ==========================================
+   SEINFELD CHANNEL BUTTON
+========================================== */
+
+document
+    .getElementById("seinfeldChannel")
+    .addEventListener(
+        "click",
+        () => {
+
+            loadBroadcast(true);
+
+
+            document
+                .getElementById("watch")
+                .scrollIntoView({
+                    behavior: "smooth"
+                });
+
+        }
+    );
+
+
+/* ==========================================
+   BACK TO LIVE TV
+========================================== */
+
+backToLive.addEventListener(
+    "click",
+    () => {
+
+        /*
+            Recalculate the live position.
+
+            Seinfeld has continued
+            broadcasting while the movie
+            was being watched.
+        */
+
+        loadBroadcast(true);
+
+    }
+);
+
+
+/* ==========================================
+   VIDEO FINISHED
 ========================================== */
 
 videoPlayer.addEventListener(
@@ -243,39 +588,27 @@ videoPlayer.addEventListener(
     () => {
 
         /*
-            Re-check the real broadcast clock
-            rather than blindly loading the
-            next episode.
+            Movies simply finish.
+
+            Live TV resynchronises with
+            the broadcast clock.
         */
 
-        loadBroadcast();
+        if (playerMode === "movie") {
+
+            return;
+
+        }
 
 
-        videoPlayer.addEventListener(
-            "canplay",
-            () => {
-
-                videoPlayer
-                    .play()
-                    .catch(error => {
-
-                        console.error(
-                            "Autoplay prevented:",
-                            error
-                        );
-
-                    });
-
-            },
-            { once: true }
-        );
+        loadBroadcast(true);
 
     }
 );
 
 
 /* ==========================================
-   LOAD LIBRARY
+   LOAD SEINFELD LIBRARY
 ========================================== */
 
 async function loadLibrary() {
@@ -285,14 +618,10 @@ async function loadLibrary() {
         placeholder.style.display =
             "flex";
 
+
         placeholder.textContent =
             "Tuning into Del Boca Vista...";
 
-
-        /*
-            Get the complete episode schedule
-            INCLUDING durations from Worker.
-        */
 
         const response =
             await fetch(
@@ -332,18 +661,17 @@ async function loadLibrary() {
         }
 
 
-        /*
-            Make sure every episode has a
-            valid duration.
-        */
-
         const missingDuration =
             episodes.find(
                 episode =>
                     !Number.isFinite(
-                        Number(episode.duration)
+                        Number(
+                            episode.duration
+                        )
                     ) ||
-                    Number(episode.duration) <= 0
+                    Number(
+                        episode.duration
+                    ) <= 0
             );
 
 
@@ -365,15 +693,6 @@ async function loadLibrary() {
             "Episode schedule loaded instantly."
         );
 
-
-        /*
-            No buildSchedule().
-            No getDuration().
-            No loading every MP4.
-
-            Work out what should be broadcasting
-            and load ONLY that video.
-        */
 
         loadBroadcast();
 
