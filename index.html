@@ -9,7 +9,7 @@
 
     <title>Del Boca Vista</title>
 
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style.css?v=12">
 </head>
 
 <body>
@@ -24,6 +24,7 @@
         <nav class="nav">
             <a href="#watch" class="active">Watch</a>
             <a href="#channels">Channels</a>
+            <a href="#movies">Movies</a>
             <a href="#schedule">Schedule</a>
         </nav>
 
@@ -63,9 +64,9 @@
 
                 <div class="programme-info">
 
-                    <div class="live-label">
-                        <span class="live-dot"></span>
-                        LIVE
+                    <div class="live-label" id="programmeType">
+                        <span class="live-dot" id="liveDot"></span>
+                        <span id="programmeTypeText">LIVE</span>
                     </div>
 
                     <h1 id="showTitle">
@@ -73,18 +74,26 @@
                     </h1>
 
                     <p class="episode" id="episodeTitle">
-                        S01 E01 · Good News, Bad News
+                        Loading...
                     </p>
 
-                    <p class="description">
+                    <p class="description" id="programmeDescription">
                         You're watching the live channel.
                     </p>
+
+                    <button
+                        id="backToLive"
+                        class="back-to-live"
+                        type="button"
+                        hidden>
+                        ← Back to Live TV
+                    </button>
 
                 </div>
 
 
                 <!-- UP NEXT -->
-                <div class="up-next">
+                <div class="up-next" id="upNext">
 
                     <span class="small-heading">
                         UP NEXT
@@ -95,7 +104,7 @@
                     </h2>
 
                     <p id="nextEpisode">
-                        S01 E02 · The Stake Out
+                        Loading...
                     </p>
 
                 </div>
@@ -123,39 +132,41 @@
 
             <div class="channel-grid">
 
-               <!-- SEINFELD CHANNEL -->
-<button
-    class="channel-card active-channel"
-    data-channel="seinfeld">
+                <!-- SEINFELD CHANNEL -->
+                <button
+                    class="channel-card active-channel"
+                    id="seinfeldChannel"
+                    data-channel="seinfeld">
 
-    <div class="channel-image">
+                    <div class="channel-image">
 
-        <img
-            src="artwork/Seinfeld5.jpg"
-            alt="Seinfeld">
+                        <img
+                            src="artwork/Seinfeld5.jpg"
+                            alt="Seinfeld">
 
-        <div class="channel-name">
-            SEINFELD
-        </div>
+                        <div class="channel-name">
+                            SEINFELD
+                        </div>
 
-        <div class="channel-live">
-            <span></span>
-            LIVE
-        </div>
+                        <div class="channel-live">
+                            <span></span>
+                            LIVE
+                        </div>
 
-    </div>
+                    </div>
 
-    <div class="channel-details">
+                    <div class="channel-details">
 
-        <strong>Seinfeld</strong>
+                        <strong>Seinfeld</strong>
 
-        <span>
-            24/7 Episodes
-        </span>
+                        <span>
+                            24/7 Episodes
+                        </span>
 
-    </div>
+                    </div>
 
-</button>
+                </button>
+
 
                 <!-- FUTURE CHANNEL -->
                 <button
@@ -202,6 +213,120 @@
 
                         <span>
                             New channel
+                        </span>
+
+                    </div>
+
+                </button>
+
+            </div>
+
+        </section>
+
+
+        <!-- MOVIES -->
+        <section class="movies-section" id="movies">
+
+            <div class="section-heading">
+
+                <div>
+                    <span class="small-heading">
+                        ON DEMAND
+                    </span>
+
+                    <h2>Movies</h2>
+                </div>
+
+            </div>
+
+
+            <div class="movie-grid">
+
+                <!-- FELLOWSHIP -->
+                <button
+                    class="movie-card"
+                    data-movie="fellowship">
+
+                    <div class="movie-image">
+
+                        <div class="movie-placeholder">
+                            <span>THE LORD OF THE RINGS</span>
+                            <strong>The Fellowship<br>of the Ring</strong>
+                        </div>
+
+                        <div class="movie-play">
+                            ▶
+                        </div>
+
+                    </div>
+
+                    <div class="movie-details">
+
+                        <strong>
+                            The Lord of the Rings:
+                            The Fellowship of the Ring
+                        </strong>
+
+                        <span>
+                            Extended Edition · 2001
+                        </span>
+
+                    </div>
+
+                </button>
+
+
+                <!-- TWO TOWERS -->
+                <button
+                    class="movie-card coming-soon"
+                    disabled>
+
+                    <div class="movie-image">
+
+                        <div class="movie-placeholder">
+                            <span>THE LORD OF THE RINGS</span>
+                            <strong>The Two Towers</strong>
+                        </div>
+
+                    </div>
+
+                    <div class="movie-details">
+
+                        <strong>
+                            The Two Towers
+                        </strong>
+
+                        <span>
+                            Coming Soon
+                        </span>
+
+                    </div>
+
+                </button>
+
+
+                <!-- RETURN OF THE KING -->
+                <button
+                    class="movie-card coming-soon"
+                    disabled>
+
+                    <div class="movie-image">
+
+                        <div class="movie-placeholder">
+                            <span>THE LORD OF THE RINGS</span>
+                            <strong>Return of the King</strong>
+                        </div>
+
+                    </div>
+
+                    <div class="movie-details">
+
+                        <strong>
+                            The Return of the King
+                        </strong>
+
+                        <span>
+                            Coming Soon
                         </span>
 
                     </div>
@@ -234,8 +359,8 @@
                     <div>
                         <strong>Seinfeld</strong>
 
-                        <p>
-                            S01 E01 · Good News, Bad News
+                        <p id="scheduleNow">
+                            Loading...
                         </p>
                     </div>
 
@@ -251,8 +376,8 @@
                     <div>
                         <strong>Seinfeld</strong>
 
-                        <p>
-                            S01 E02 · The Stake Out
+                        <p id="scheduleNext">
+                            Loading...
                         </p>
                     </div>
 
@@ -269,7 +394,7 @@
     <footer>
 
         <div class="logo footer-logo">
-            JUST<span>WATCH</span>
+            DEL BOCA<span>VISTA</span>
         </div>
 
         <p>
@@ -279,7 +404,7 @@
     </footer>
 
 
-    <script src="app.js?v=11"></script>
+    <script src="app.js?v=12"></script>
 
 </body>
 
