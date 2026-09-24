@@ -51,41 +51,30 @@ body {
     z-index: 100;
 }
 
-
 .logo {
     color: white;
-
     font-size: 21px;
     font-weight: 800;
-
     letter-spacing: 1px;
-
     text-decoration: none;
 }
-
 
 .logo span {
     color: #e50914;
 }
-
 
 .nav {
     display: flex;
     gap: 30px;
 }
 
-
 .nav a {
     color: #9298a2;
-
     text-decoration: none;
-
     font-size: 14px;
     font-weight: 600;
-
     transition: 0.2s;
 }
-
 
 .nav a:hover,
 .nav a.active {
@@ -99,47 +88,34 @@ body {
 
 .watch-section {
     width: min(1200px, 92%);
-
     margin: 45px auto 80px;
 }
 
-
 .player-container {
     width: 100%;
-
     aspect-ratio: 16 / 9;
-
     position: relative;
-
     overflow: hidden;
-
     background: #000;
-
     border-radius: 14px;
 
     box-shadow:
         0 25px 80px rgba(0, 0, 0, 0.55);
 }
 
-
 #videoPlayer {
     width: 100%;
     height: 100%;
-
     object-fit: contain;
-
     background: #000;
 }
 
-
 .player-placeholder {
     position: absolute;
-
     inset: 0;
 
     display: flex;
     flex-direction: column;
-
     justify-content: center;
     align-items: center;
 
@@ -155,7 +131,6 @@ body {
     color: #777;
 }
 
-
 .play-icon {
     width: 70px;
     height: 70px;
@@ -169,41 +144,35 @@ body {
     padding-left: 5px;
 
     background: #ffffff;
-
     color: #080a0d;
 
     font-size: 25px;
 }
 
-
 .programme-area {
     display: grid;
-
     grid-template-columns: 1fr 320px;
-
     gap: 50px;
-
     margin-top: 28px;
 }
 
-
 .live-label {
     display: flex;
-
     align-items: center;
-
     gap: 8px;
 
     color: #ff3541;
 
     font-size: 12px;
     font-weight: 800;
-
     letter-spacing: 1.5px;
 
     margin-bottom: 12px;
 }
 
+.live-label.movie-mode {
+    color: #aeb4bd;
+}
 
 .live-dot {
     width: 8px;
@@ -217,36 +186,30 @@ body {
         0 0 10px rgba(255, 53, 65, 0.8);
 }
 
+.live-label.movie-mode .live-dot {
+    display: none;
+}
 
 .programme-info h1 {
     font-size: clamp(28px, 4vw, 42px);
-
     margin-bottom: 8px;
 }
 
-
 .episode {
     color: #b7bbc2;
-
     font-size: 17px;
-
     margin-bottom: 15px;
 }
 
-
 .description {
     color: #747b85;
-
     line-height: 1.6;
 }
 
-
 .up-next {
     border-left: 1px solid #292d34;
-
     padding-left: 30px;
 }
-
 
 .small-heading {
     display: block;
@@ -255,65 +218,78 @@ body {
 
     font-size: 11px;
     font-weight: 800;
-
     letter-spacing: 1.8px;
 
     margin-bottom: 10px;
 }
 
-
 .up-next h2 {
     margin-bottom: 6px;
-
     font-size: 20px;
 }
 
-
 .up-next p {
     color: #8d939c;
-
     font-size: 14px;
+}
+
+.back-to-live {
+    margin-top: 22px;
+
+    padding: 11px 17px;
+
+    border: 1px solid #343a44;
+    border-radius: 7px;
+
+    background: #151920;
+    color: #ffffff;
+
+    font-size: 13px;
+    font-weight: 700;
+
+    cursor: pointer;
+
+    transition: 0.2s;
+}
+
+.back-to-live:hover {
+    background: #20252e;
+    border-color: #4b535f;
 }
 
 
 /* ------------------------------
-   CHANNELS
+   CHANNELS / MOVIES
 --------------------------------*/
 
 .channels-section,
+.movies-section,
 .schedule-section {
     width: min(1200px, 92%);
-
     margin: 0 auto 100px;
 }
-
 
 .section-heading {
     margin-bottom: 25px;
 }
-
 
 .section-heading h2,
 .schedule-section h2 {
     font-size: 28px;
 }
 
-
-.channel-grid {
+.channel-grid,
+.movie-grid {
     display: grid;
-
-    grid-template-columns:
-        repeat(3, 1fr);
-
+    grid-template-columns: repeat(3, 1fr);
     gap: 20px;
 }
 
-
-.channel-card {
+.channel-card,
+.movie-card {
     border: 0;
 
     background: #101319;
-
     color: white;
 
     border-radius: 12px;
@@ -329,17 +305,14 @@ body {
         background 0.2s;
 }
 
-
-.channel-card:hover {
+.channel-card:hover,
+.movie-card:hover {
     transform: translateY(-4px);
-
     background: #151920;
 }
 
-
-/* Channel artwork container */
-
-.channel-image {
+.channel-image,
+.movie-image {
     position: relative;
 
     width: 100%;
@@ -355,17 +328,13 @@ body {
         );
 
     display: flex;
-
     align-items: center;
     justify-content: center;
 }
 
-
-/* Channel artwork */
-
-.channel-image img {
+.channel-image img,
+.movie-image img {
     position: absolute;
-
     inset: 0;
 
     width: 100%;
@@ -377,19 +346,14 @@ body {
     display: block;
 }
 
-
 .channel-name {
     position: relative;
-
     z-index: 2;
 
     font-size: clamp(20px, 3vw, 32px);
-
     font-weight: 900;
-
     letter-spacing: 2px;
 }
-
 
 .channel-live {
     position: absolute;
@@ -406,10 +370,8 @@ body {
     border-radius: 5px;
 
     font-size: 10px;
-
     font-weight: bold;
 }
-
 
 .channel-live span {
     display: inline-block;
@@ -424,30 +386,96 @@ body {
     margin-right: 5px;
 }
 
-
-.channel-details {
+.channel-details,
+.movie-details {
     padding: 16px;
 }
 
-
-.channel-details strong {
+.channel-details strong,
+.movie-details strong {
     display: block;
-
     margin-bottom: 5px;
 }
 
-
-.channel-details span {
+.channel-details span,
+.movie-details span {
     color: #737a84;
-
     font-size: 13px;
 }
 
 
+/* ------------------------------
+   MOVIES
+--------------------------------*/
+
+.movie-placeholder {
+    display: flex;
+    flex-direction: column;
+
+    align-items: center;
+    justify-content: center;
+
+    text-align: center;
+
+    padding: 25px;
+
+    position: relative;
+    z-index: 2;
+}
+
+.movie-placeholder span {
+    color: #8e949d;
+
+    font-size: 9px;
+    font-weight: 800;
+
+    letter-spacing: 3px;
+
+    margin-bottom: 10px;
+}
+
+.movie-placeholder strong {
+    font-family: Georgia, serif;
+
+    font-size: clamp(19px, 2.4vw, 30px);
+
+    font-weight: 500;
+
+    line-height: 1.05;
+}
+
+.movie-play {
+    position: absolute;
+
+    right: 15px;
+    bottom: 15px;
+
+    width: 38px;
+    height: 38px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding-left: 3px;
+
+    border-radius: 50%;
+
+    background: rgba(255, 255, 255, 0.92);
+    color: #080a0d;
+
+    font-size: 14px;
+
+    z-index: 4;
+}
+
 .coming-soon {
     opacity: 0.35;
-
     cursor: default;
+}
+
+.coming-soon:hover {
+    transform: none;
 }
 
 
@@ -459,7 +487,6 @@ body {
     margin-bottom: 25px;
 }
 
-
 .schedule {
     background: #101319;
 
@@ -469,7 +496,6 @@ body {
 
     overflow: hidden;
 }
-
 
 .schedule-item {
     display: grid;
@@ -483,30 +509,24 @@ body {
     border-bottom: 1px solid #20242b;
 }
 
-
 .schedule-item:last-child {
     border-bottom: 0;
 }
-
 
 .schedule-item.current {
     background: #151920;
 }
 
-
 .schedule-time {
     color: #747b85;
 
     font-size: 12px;
-
     font-weight: 800;
 }
-
 
 .schedule-item.current .schedule-time {
     color: #ff3541;
 }
-
 
 .schedule-item p {
     color: #777e87;
@@ -527,7 +547,6 @@ footer {
     border-top: 1px solid #20242b;
 
     display: flex;
-
     flex-direction: column;
 
     justify-content: center;
@@ -537,7 +556,6 @@ footer {
 
     color: #606771;
 }
-
 
 .footer-logo {
     font-size: 17px;
@@ -552,25 +570,20 @@ footer {
 
     .programme-area {
         grid-template-columns: 1fr;
-
         gap: 25px;
     }
 
-
     .up-next {
         border-left: 0;
-
         border-top: 1px solid #292d34;
 
         padding-left: 0;
-
         padding-top: 20px;
     }
 
-
-    .channel-grid {
-        grid-template-columns:
-            repeat(2, 1fr);
+    .channel-grid,
+    .movie-grid {
+        grid-template-columns: repeat(2, 1fr);
     }
 
 }
@@ -583,85 +596,73 @@ footer {
 @media (max-width: 600px) {
 
     .header {
-        height: 58px;
+        height: auto;
+        min-height: 58px;
 
-        padding: 0 16px;
-    }
+        padding: 10px 16px;
 
-
-    .logo {
-        font-size: 17px;
-    }
-
-
-    .nav {
         gap: 15px;
     }
 
-
-    .nav a {
-        font-size: 12px;
+    .logo {
+        font-size: 17px;
+        flex-shrink: 0;
     }
 
+    .nav {
+        gap: 13px;
+    }
 
-    .nav a:nth-child(3) {
+    .nav a {
+        font-size: 11px;
+    }
+
+    .nav a[href="#schedule"] {
         display: none;
     }
 
-
     .watch-section {
         width: 100%;
-
         margin-top: 0;
     }
-
 
     .player-container {
         border-radius: 0;
     }
 
-
     .programme-area {
         padding: 0 18px;
-
         margin-top: 20px;
     }
-
 
     .programme-info h1 {
         font-size: 27px;
     }
 
-
     .episode {
         font-size: 15px;
     }
 
-
     .channels-section,
+    .movies-section,
     .schedule-section {
         width: calc(100% - 36px);
-
         margin-bottom: 70px;
     }
 
-
-    .channel-grid {
+    .channel-grid,
+    .movie-grid {
         grid-template-columns: 1fr;
     }
 
-
     .schedule-item {
         grid-template-columns: 60px 1fr;
-
         padding: 18px;
     }
-
 
     .play-icon {
         width: 55px;
         height: 55px;
-
         font-size: 20px;
     }
 
